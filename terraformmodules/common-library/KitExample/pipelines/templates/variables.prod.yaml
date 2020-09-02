@@ -1,0 +1,37 @@
+# -----------------------------------------------------------------------------
+# .SYNOPSIS
+#   This is the pipeline variables template yaml for the prod environment.
+# .DESCRIPTION
+#   This pipeline contains all common variables referenced in main pipeline.
+
+# .ASSUMPTIONS:
+#     1. You are referencing this template from an ado pipeline
+#        under the variables object.
+
+# .NOTES
+#     File Name      : variables.prod.yaml
+#     Prerequisite   : ADO Multi-Stage Yaml Pipeline
+
+# General Variables ----------
+
+# .VARIABLE repoPath
+#   Name of the jumpstart kit being used
+# .VARIABLE serviceConnectionVPBackend
+#   Name of the service connection for the shared VP tower resources
+# .VARIABLE serviceConnectionApp
+#   Name of the service connection for the application subscription
+# .VARIABLE appSPNObjectId
+#   Object ID of the application SPN (this is found in the enterprise application section of Azure AD)
+#   To obtain this, find the service connection in ADO, click on "Manage Service Principal" then the link under "Managed application in local directory" and copy the object ID from here.
+# -----------------------------------------------------------------------------
+
+variables:
+  - name: repoPath
+    value: "jumpstart-vmss"
+#Service Connection variables
+  - name: serviceConnectionVPBackend
+    value: ES-CUS-AT&TEXHIBIT01-DEV-ATTDEVOPSPATTERN-SPN
+  - name: serviceConnectionApp
+    value: ES-CUS-AT&TEXHIBIT04INFRANP-DEV-ATTDEVOPSPATTERN-SPN
+  - name: appSPNObjectId
+    value: 06fe1fca-1a89-439c-a693-4a761adf3039

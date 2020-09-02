@@ -1,0 +1,153 @@
+# -----------------------------------------------------------------------------
+# .SYNOPSIS
+#   This is the pipeline variables template yaml.
+# .DESCRIPTION
+#   This pipeline contains all common variables referenced in main pipeline.
+
+# .ASSUMPTIONS:
+#     1. You are referencing this template from an ado pipeline
+#        under the variables object.
+
+# .NOTES
+#     File Name      : variables.yaml
+#     Prerequisite   : ADO Multi-Stage Yaml Pipeline
+
+# .VARAIBLE_NAMING_CONVENTION
+#   sig = shared image gallery
+#   rg = resource group
+#   dest = destination
+#   sa = storage account
+
+# General Variables ----------
+
+# .PARAMETER LOCATION
+#   Location of the Azure Resources
+# .PARAMETER name
+#   Main string of the Continuous Deployment Azure Resource names.
+# .PARAMETER prefix
+#   Prefix string of the Continuous Deployment Azure Resource names.
+# .PARAMETER suffix_image
+#   Suffix string for the Azure Image Resource names.
+# .PARAMETER suffix_tfstate
+#   Suffix string for the Terraform remote state.
+# .PARAMETER tfstate_name
+#   Name of the tf state resources
+# .PARAMETER workload_name
+#   Name of the workload resources
+# .PARAMETER artifact_org
+#   Name of the organization where the Azure Artifacts are hosted
+
+# Image Builder Variables ----
+
+# .PARAMETER base_sig
+#   The base shared image gallery name where the vanilla image exists
+# .PARAMETER base_sig_rg
+#   The base shared image gallery resource group name where the vanilla image exists
+# .PARAMETER base_sig_subid
+#   The base shared image gallery's subscription id where the vanilla image exists
+# .PARAMETER base_sig_definition
+#   The base shared image definition where the vanilla image exists
+# .PARAMETER base_sig_version
+#   The base shared image definition's version where the vanilla image exists
+# .PARAMETER main_image_name
+#   The name of the destination image resources like rg, sig, storage account
+
+# .PARAMETER dest_sig_definition_glowroot
+#   The destination shared image gallery definition of glowroot to deploy
+# .PARAMETER dest_sig_version_glowroot
+#   The destination shared image gallery definition's version to deploy
+
+# .PARAMETER artifact_feed_glowroot
+#   Glowroot's artifact feed from azure artifacts
+# .PARAMETER artifact_name_glowroot
+#   Glowroot's artifact name from azure artifacts
+# .PARAMETER artifact_version_glowroot
+#   Glowroot's artifact version from azure artifacts
+# .PARAMETER artifact_name_blob_glowroot
+#   Glowroot's file name in the artifact. This will be pushed to a storage account
+# -----------------------------------------------------------------------------
+
+variables:
+  # general variables
+  - name: agent_pool
+    value: 'Custom'
+  - name: LOCATION
+    value: eastus  
+  - name: name
+    value: $(prefix)$(env)
+  - name: prefix
+    value: jstart
+  - name: suffix_image
+    value: buildimg
+  - name: suffix_tfstate
+    value: tf
+  - name: workload_name
+    value: $(name)workload
+  - name: artifact_org
+    value: "https://dev.azure.com/ATTDevOps/"
+  - name: repoPath
+    value: "jumpstart-vmss"
+
+  # terraform state
+  - name: tfstate_name
+    value: $(name)$(suffix_tfstate)state
+  - name: tfstate_container
+    value: workload
+
+  # image builder variables ---------------------------------------------------
+  - name: base_sig
+    value: ATT_Shared_Images
+  - name: base_sig_rg
+    value: att-golden-images
+  - name: base_sig_subid
+    value: 46d0acae-94eb-48b3-9ce7-e26eb3ee72a5
+  - name: base_sig_definition
+    value: RHEL-7
+  - name: base_sig_version
+    value: 0.0.2
+  - name: main_image_name
+    value: $(prefix)$(suffix_image)$(PROJECT-NAME)
+
+  # glowroot --------------------------
+  - name: dest_sig_definition_glowroot
+    value: glowroot
+  - name: dest_sig_version_glowroot
+    value: 2.0.0
+  # glowroot packer file
+  - name: packer_glowroot
+    value: './pipelines/packer/glowroot/packer.json'
+  # glowroot's azure artifact
+  - name: artifact_feed_glowroot
+    value: "ATT Cloud/ATTProvided"
+  - name: artifact_name_glowroot
+    value: glowroot
+  - name: artifact_version_glowroot
+    value: 0.13.5
+  - name: artifact_name_blob_glowroot
+    value: glowroot-central-0.13.5-dist.zip
+
+  # springboot war --------------------------
+  - name: dest_sig_definition_springbootwar
+    value: springbootwar
+  - name: dest_sig_version_springbootwar
+    value: 1.0.0
+  # springboot packer file
+  - name: packer_springbootwar
+    value: './pipelines/packer/springboot/packer.json'
+  # springboot's war azure artifact
+  - name: artifact_feed_springbootwar
+    value: "ATT Cloud/test"
+  - name: artifact_name_springbootwar
+    value: tododemowar
+  - name: artifact_version_springbootwar
+    value: 0.1.1
+  - name: artifact_name_blob_springbootwar
+    value: TodoDemo-0.0.2-SNAPSHOT.zip
+
+  # cassandra --------------------------
+  - name: dest_sig_definition_cassandra
+    value: cassandra
+  - name: dest_sig_version_cassandra
+    value: 1.0.0
+
+  # eof image builder variables -----------------------------------------------

@@ -1,0 +1,4 @@
+variables:
+  repoPath: jumpstart-paas-paas
+  motsId: <motsid>
+  poolName: 'Custom'

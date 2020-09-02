@@ -1,0 +1,34 @@
+module "BaseInfrastructure" {
+  source                           = "../../common-library/TerraformModules/BaseInfrastructure"
+  resource_group_name              = var.resource_group_name              # Azure Resource Group Name
+  location                         = var.location                         # Azure Region Name
+  virtual_networks                 = var.virtual_networks                 # VNet's Block
+  subnets                          = var.subnets                          # Subnet's Block
+  route_tables                     = var.route_tables                     # Route Tables Block
+  network_security_groups          = var.network_security_groups          # NSG Rules Block
+  net_additional_tags              = var.additional_tags                  # Additional Tags
+  vnet_peering                     = var.vnet_peering                     # VNet Peering Block  
+  base_infra_log_analytics_name    = var.base_infra_log_analytics_name    # Log Analytics Name
+  sku                              = var.sku                              # Log Analytics SKU
+  retention_in_days                = var.retention_in_days                # Log Analytics Retention In Days
+  base_infra_storage_accounts      = var.base_infra_storage_accounts      # Storage Accounts Block
+  containers                       = var.containers                       # SA Containers Block
+  blobs                            = var.blobs                            # SA Blobs Block
+  queues                           = var.queues                           # SA Queues Block
+  file_shares                      = var.file_shares                      # SA File Shares Block
+  tables                           = var.tables                           # SA Tables Block  
+  base_infra_keyvault_name         = var.base_infra_keyvault_name         # Key Valut Name  
+  sku_name                         = var.sku_name                         # Key Vault SKU Name
+  network_acls                     = var.network_acls                     # Key Valut Network Access Block
+  access_policies                  = var.access_policies                  # Key Vault Access Policies Block
+  diagnostics_storage_account_name = var.diagnostics_storage_account_name # Key Valut  Storage Account for Diagnostics 
+  soft_delete_enabled              = var.soft_delete_enabled              # KV Soft Delete Flag
+  purge_protection_enabled         = var.purge_protection_enabled         # KV Purge Protection Flag
+  enabled_for_deployment           = var.enabled_for_deployment           # KV Enable for Deployment Flag
+  enabled_for_disk_encryption      = var.enabled_for_disk_encryption      # KV Enable for Disk Encryption Flag
+  enabled_for_template_deployment  = var.enabled_for_template_deployment  # KV Enable for Template Deployment Flag
+  mandatory_tags                   = var.mandatory_tags
+  app_security_group_ids_map       = module.ApplicationSecurityGroup.app_security_group_ids_map
+  firewall_private_ips_map         = module.Firewall.firewall_private_ips_map
+  dependencies                     = [module.ApplicationSecurityGroup.depended_on_asg, module.Firewall.depended_on_firewall]
+}

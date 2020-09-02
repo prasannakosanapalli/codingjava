@@ -1,0 +1,22 @@
+parameters:
+  serviceConnectionVPBackend: ""
+  serviceConnectionApp: ""
+  appSPNObjectId: ""
+  environment: "" 
+
+jobs:
+  - deployment: ${{ parameters.environment }}
+    displayName: Deploy
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - checkout: common-library
+          - template: PipelineTemplates/Terraform/Terraform.yaml@common-library
+            parameters:
+              serviceConnectionVPBackend: ${{ parameters.serviceConnectionVPBackend }}
+              serviceConnectionApp: ${{ parameters.serviceConnectionApp }}
+              appSPNObjectId: ${{ parameters.appSPNObjectId}}
+              environment: ${{ parameters.environment }}  

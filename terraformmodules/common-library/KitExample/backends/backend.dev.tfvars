@@ -1,0 +1,5 @@
+resource_group_name = "jstart5949paasdbtfstate"
+storage_account_name = "jstart5949paasdbtfstate"
+container_name = "<motsid>"
+key = "<motsid>.tfstate"
+region = "eastus"

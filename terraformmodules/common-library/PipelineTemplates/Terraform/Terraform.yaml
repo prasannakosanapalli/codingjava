@@ -1,0 +1,38 @@
+parameters:
+  serviceConnectionApp:
+  environment:
+
+steps:
+  - task: AzureCLI@2
+    displayName: Terraform Backend Setup
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnectionApp }}
+      addSpnToEnvironment: true
+      scriptType: bash
+      scriptPath: ./common-library/PipelineTemplates/Terraform/TerraformSetup.sh
+      arguments: $(Build.Repository.Name) ${{ parameters.environment }} ${{ parameters.serviceConnectionApp }}
+  - task: AzureCLI@2
+    displayName: Terraform Init
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnectionApp }}
+      addSpnToEnvironment: true
+      scriptType: bash
+      scriptPath: ./common-library/PipelineTemplates/Terraform/TerraformInit.sh
+      arguments: $(Build.Repository.Name) ${{ parameters.environment }}
+  - task: AzureCLI@2
+    displayName: Terraform Plan
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnectionApp }}
+      addSpnToEnvironment: true
+      scriptType: bash
+      scriptPath: ./common-library/PipelineTemplates/Terraform/TerraformPlan.sh
+      arguments: $(Build.Repository.Name) ${{ parameters.environment }}
+  - task: AzureCLI@2
+    displayName: Terraform Apply
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnectionApp }}
+      addSpnToEnvironment: true
+      scriptType: bash
+      scriptPath: ./common-library/PipelineTemplates/Terraform/TerraformApply.sh
+      arguments: $(Build.Repository.Name) ${{ parameters.environment }}

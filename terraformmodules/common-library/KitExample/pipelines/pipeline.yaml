@@ -1,0 +1,91 @@
+# -----------------------------------------------------------------------------
+# .SYNOPSIS
+#   This pipeline is the main pipeline that contains the top level stages for the deployment
+# using other YAML templates as references both locally and from the common library
+# .DESCRIPTION
+#   This pipeline will:
+#  1. Add the common-library for shared pipeline references, which include
+#     a. YAML references for Image Builder to deploy custom images and / or containers
+#     b. YAML references for Terraform Init, Plan, and Apply, which contain references to common bash scripts
+
+# .ASSUMPTIONS:
+#     1. Looping is not needed for environment stages due to different parameters per environment
+#     2. Terraform steps are the same across all projects (setup, init, plan, apply)
+
+# .PARAMETER serviceConnection
+#     Name of the ADO service connection used per environment
+# .PARAMETER environment
+#     Environment identifier to be passed to the common library YAML references
+# -----------------------------------------------------------------------------
+
+name: $(version).$(Rev:rr)
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+
+variables:
+  - name: version
+    value: 0.1
+
+pool:
+  name: $(poolName)
+
+resources:
+  repositories:
+  - repository: common-library
+    type: git
+    name: ATT Cloud/common-library
+    ref: users/mistiers/5949_paaspaasdbmodules
+
+stages:
+# - stage: IMAGE_BUILDER
+#   displayName: IMAGE_BUILDER
+#   variables:
+#   - template: /KitExample/pipelines/templates/variables.imagebuilder.yaml
+#   jobs:
+#     - template: PipelineTemplates/ImageBuilder/whatever.yaml@common-library
+#       parameters:
+#         stuff: stuff
+
+- stage: DEV
+  displayName: DEV
+  variables:
+  - template: /KitExample/pipelines/templates/variables.dev.yaml
+  jobs:
+    - template: /pipelines/stage.yaml
+      parameters:
+        serviceConnectionVPBackend: ${{ variables.serviceConnectionVPBackend }}
+        serviceConnectionApp: ${{ variables.serviceConnectionApp }}
+        appSPNObjectId: ${{ variables.appSPNObjectId }}
+        environment: dev
+
+- stage: QA
+  displayName: QA
+  variables:
+  - template: /KitExample/pipelines/templates/variables.qa.yaml
+  dependsOn: DEV
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  jobs:
+    - template: /pipelines/stage.yaml
+      parameters:
+        serviceConnectionVPBackend: ${{ variables.serviceConnectionVPBackend }}
+        serviceConnectionApp: ${{ variables.serviceConnectionApp }}
+        appSPNObjectId: ${{ variables.appSPNObjectId }}
+        environment: qa
+
+- stage: PROD
+  displayName: PROD
+  variables:
+  - template: /KitExample/pipelines/templates/variables.prod.yaml
+  dependsOn: QA
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  jobs:
+    - template: /pipelines/stage.yaml
+      parameters:
+        serviceConnectionVPBackend: ${{ variables.serviceConnectionVPBackend }}
+        serviceConnectionApp: ${{ variables.serviceConnectionApp }}
+        appSPNObjectId: ${{ variables.appSPNObjectId }}
+        environment: prod
